@@ -1,0 +1,165 @@
+%{
+#include<stdlib.h>
+#include<stdio.h>
+#define YYSTYPE int
+int yyparse();
+int yylex();
+void yyerror(const char* const message);
+extern FILE *yyin;
+
+%}
+%error-verbose
+
+
+%token DEFINE
+%token INC
+%token FMAIN
+%token ENT
+%token LIRE
+%token ECRIRE
+%token SI
+%token SINON
+%token TANTQUE
+%token AFFECT
+%token VIRG
+%token POINTVIRG
+%token PAROUV
+%token PARFER
+%token ACCOUV
+%token ACCFER
+%token IDENT
+%token CHAINE
+%token ENTIER
+%left INF
+%left INFEGAL
+%left DIFF
+%left EGAL
+%left SUPEGAL
+%left SUP
+%left MULT DIV
+%left PLUS MOINS
+%token END 0 "end of file"
+%start FICHIER
+
+%%
+
+
+FICHIER: PROGRAMME END
+;
+PROGRAMME:DECL_CONST PROGRAMME2
+         | DECL_VAR PROG
+         | PROG 
+;
+PROGRAMME2: DECL_VAR
+          | PROG 
+;
+DECL_CONST: DEFINE IDENT ENTIER DECL_CONST2 
+;
+DECL_CONST2:/*epsilon*/
+;
+DECL_VAR: ENT IDENT POINTVIRG DECL_VAR2 
+	 | /*epsilon*/
+;
+DECL_VAR2: SUITE_VAR POINTVIRG DECL_VAR3
+         | POINTVIRG DECL_VAR 
+	 | /*epsilon*/
+;
+DECL_VAR3: DECL_VAR
+         |/*epsilon*/
+;
+SUITE_VAR: VIRG IDENT SUITE_VAR2
+;
+SUITE_VAR2: SUITE_VAR
+             |/*epsilon*/
+;
+PROG: FMAIN PAROUV PARFER BLOC
+;
+BLOC: ACCOUV BLOC2
+;
+BLOC2: AUTRES_INST ACCFER
+;
+AUTRES_INST: INSTRUCTION AUTRES_INST2
+;
+AUTRES_INST2: AUTRES_INST
+             |/*epsilon*/
+;
+INSTRUCTION: CONDITIONELLE
+             | ITERATION
+             | AFFECTATION
+             | LECTURE
+             | ECRITURE
+;
+CONDITIONELLE: SI PAROUV EXP PARFER BLOC SUITE_COND
+;
+SUITE_COND:/*epsilon*/
+          | SINON BLOC
+;
+ITERATION: TANTQUE PAROUV EXP PARFER BLOC
+;
+AFFECTATION: IDENT AFFECT EXP POINTVIRG
+;
+LECTURE: LIRE PAROUV IDENT PARFER POINTVIRG
+;
+ECRITURE: ECRIRE PAROUV ECRITURE2
+;
+ECRITURE2: PARFER POINTVIRG
+           | EXP_OU_CH ECRITURE3
+;
+ECRITURE3: AUTRES_ECRI PARFER POINTVIRG
+           | PARFER POINTVIRG
+;
+AUTRES_ECRI: VIRG EXP_OU_CH AUTRES_ECRI2
+;
+AUTRES_ECRI2: AUTRES_ECRI POINTVIRG
+            | /*epsilon*/
+;
+EXP_OU_CH: EXP
+	   | CHAINE
+        
+;
+EXP: TERME EXP2
+;
+EXP2: OP_BIN EXP
+    | OP_REL EXP
+    |  /*epsilon*/
+;
+TERME: ENTIER
+     | IDENT
+     | PAROUV EXP PARFER
+     | MOINS TERME
+;
+OP_BIN: PLUS
+      | MOINS
+      | MULT
+      | DIV
+;
+OP_REL: INF
+      | INFEGAL
+      | DIFF
+      | SUPEGAL
+      | SUP
+;
+%%
+
+
+void yyerror(const char* const message)
+{
+    extern int yylineno;
+    printf("erreur dans la ligne %d %s \n", yylineno , message);
+    exit(1);
+}
+
+
+void main(int argc, char* argv[]) {
+
+	printf("Ouverture de fichier %s  :\n",argv[1]);
+	
+	yyin=fopen(argv[1],"r");
+
+	if (yyin>0)printf("fichier ouvert correctement\n");
+	else printf("ouverture de fichier echoué");
+	if (yyparse()==0) printf("succés\n");
+	else yyerror("erreur");
+}
+
+

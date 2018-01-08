@@ -1,0 +1,63 @@
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include"project.tab.h"
+extern YYSTYPE yylval;
+#define yyterminate() return END
+%}
+
+%option yylineno
+
+chaine "([a-zA-Z]+|[0-9]+)+"
+ident  [a-zA-Z][a-zA-Z0-9]*
+
+virg ","
+pointvirg ";"
+parouv "("
+parfer ")"
+inf "<"
+infegal "<="
+egal "=="
+diff "<>"
+sup ">"
+supegal ">="
+accouv "{"
+accfer "}"
+
+
+%%
+
+
+
+main {return(FMAIN);}
+define {return(DEFINE);}
+int {return(ENT);}
+scanf {return(LIRE);}
+printf {return(ECRIRE);}
+if {return(SI);}
+else {return(SINON);}
+while {return(TANTQUE);}
+[0-9]+ { return(ENTIER);}
+{ident} {return(IDENT);}
+{chaine} {return(CHAINE);}
+{virg} {return(VIRG);}
+{pointvirg} {return(POINTVIRG);}
+{parouv} {return(PAROUV);}
+{parfer} {return(PARFER);}
+{accouv} {return(ACCOUV);}
+{accfer} {return(ACCFER);}
+{inf} {return(INF);}
+{infegal} {return(INFEGAL);}
+{egal} {return(EGAL);}
+{diff} {return(DIFF);}
+{sup} {return(SUP);}
+{supegal} {return(SUPEGAL);} 
+"=" {return(AFFECT);}
+"+" {return (PLUS);}
+"-" {return (MOINS);}
+"*" {return (MULT);}
+"/" {return (DIV);}
+[\n]        {yylineno++;}
+
+%%
+

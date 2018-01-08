@@ -1,0 +1,4 @@
+pro : project.y project.flex
+	bison -d project.y
+	flex project.flex
+	gcc -o pro lex.yy.c project.tab.c -lfl
